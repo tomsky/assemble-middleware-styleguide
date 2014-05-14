@@ -1,0 +1,39 @@
+{
+  "name": "assemble-middleware-kss",
+  "description": "Styleguide generator plugin for Assemble.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/tomsky/assemble-middleware-kss",
+  "author": {
+    "name": "Tom-Marius Olsen",
+    "url": "https://github.com/tomsky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tomsky/assemble-middleware-kss.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tomsky/assemble-middleware-kss/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/tomsky/assemble-middleware-kss/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "./index.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "dependencies": {
+    "kss": "~0.3.7",
+    "lodash-node": "~2.4.1"
+  },
+  "devDependencies": {
+
+  },
+  "keywords": [
+    "assemble",
+    "styleguide",
+    "kss"
+  ]
+}
