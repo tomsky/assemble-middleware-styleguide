@@ -48,7 +48,9 @@ module.exports = function(params, done) {
 
                 //Create a reference to all subsections that we can add to the toc
                 var reference = tocReference( styleguide.section( sectionReference ) );
-                _.forEach(styleguide.section( sectionReference + '.x' ), function(sectionDepth2){
+
+                var x = new RegExp(sectionReference+"\\.[1-99]","g");
+                _.forEach(styleguide.section( x ), function(sectionDepth2){
                     reference.sections.push( tocReference(sectionDepth2) );
                     _.forEach(styleguide.section( sectionReference + '.' + (sectionDepth2.reference().split('.')[1]) + '.x' ), function(sectionDepth3){
                         reference.sections[reference.sections.length-1].sections.push( tocReference(sectionDepth3) );
@@ -57,7 +59,8 @@ module.exports = function(params, done) {
                 toc.push(reference);
 
                 //Create array of all sections that we can pass to assemble
-                var sections = [styleguide.section( sectionReference )].concat( styleguide.section( sectionReference + '.*' ) );
+                var x = new RegExp(sectionReference+"(.[1-99])?(.[1-99])?","g");
+                var sections = styleguide.section( x );
 
                 //There seems to be a problem with som circular-structure in the modifiers when pushing sections to Assemble,
                 //This loops the over each modifier and removes the circular-structure. It's not pretty but i works.
