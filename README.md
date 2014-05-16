@@ -2,16 +2,14 @@
 
 Styleguide generator plugin for Assemble using [kss-node](https://github.com/hughsk/kss-node).
 
-**NOTE: this middlweare requires Assemble v0.5.0.**
-
 ##Usage
 
-Register the middleware with Assemble.
+Register the plugin with Assemble.
 
 ```
 assemble: {
   options: {
-    middleware: ['assemble-middleware-kss'],
+    plugins: ['assemble-middleware-kss'],
     kss: {
 	  layout: 'templates/styleguide.hbs',
       src: 'sass',

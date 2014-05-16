@@ -10,8 +10,12 @@ var fs = require('fs');
 var kss  = require('kss');
 var _ = require('lodash-node');
 
-module.exports = function(assemble) {
+module.exports = function(params, done) {
     'use strict';
+
+    var grunt   = params.grunt;
+    var options = params.assemble.options.kss || {};
+    var tmpl    = fs.readFileSync(options.layout, 'utf8');
 
     function tocReference(section){
         return {
@@ -22,12 +26,9 @@ module.exports = function(assemble) {
         };
     }
 
-    var middleware = function(params, next) {
+    if(!_.isUndefined(options)){
 
-        var options = params.assemble.options.kss;
-        var tmpl    = fs.readFileSync(options.layout, 'utf8');
-
-        console.info('middleware: assemble-middleware-kss\n');
+        console.log('assemble-middleware-kss');
 
         kss.traverse(options.src, { mask: '*.scss' }, function(err, styleguide) {
             if (err) throw err;
@@ -58,29 +59,32 @@ module.exports = function(assemble) {
                 //Create array of all sections that we can pass to assemble
                 var sections = [styleguide.section( sectionReference )].concat( styleguide.section( sectionReference + '.*' ) );
 
-                //Add pages to assemble
-                params.pages.push({
-                    _id: 'section_' + sectionReference,
-                    type: 'styleguide',
-                    data: {
-                        sections: sections
-                    },
-                    orig: tmpl,
-                    src:  '',
-                    dest: options.dest + '/section-' + sectionReference + '.html'
+                //There seems to be a problem with som circular-structure in the modifiers when pushing sections to Assemble,
+                //This loops the over each modifier and removes the circular-structure. It's not pretty but i works.
+                _.forEach(sections, function(section, key){
+                    var modifiers = [];
+                    _.forEach(section.modifiers(), function(modifier, key){
+                        modifier.data.section = null;
+                        modifiers.push(modifier)
+                    });
+                    sections[key].data.modifiers = modifiers;
                 });
+
+                params.assemble.options.pages.push({
+                    data: { sections: sections },
+                    dest: options.dest + '/section-' + sectionReference + '.html',
+                    page: tmpl,
+                });
+
             });
 
             //Add the styleguide toc to assemble globlally
-            params.assemble.data.styleguide = toc;
-
-            next();
+            params.assemble.options.data.styleguide = toc;
+            done();
         });
-    };
+    }
+};
 
-    middleware.event = 'assemble:before:build';
-
-    return {
-        'assemble-middleware-kss': middleware
-    };
+module.exports.options = {
+  stage: 'render:pre:pages'
 };
