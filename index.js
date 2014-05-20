@@ -1,6 +1,6 @@
 /*
- * assemble-middleware-kss
- * https://github.com/tomsky/assemble-middleware-kss
+ * assemble-middleware-styleguide
+ * https://github.com/tomsky/assemble-middleware-styleguide
  *
  * Copyright (c) 2014 Tom-Marius Olsen
  * Licensed under the MIT license.
@@ -10,16 +10,17 @@ var fs = require('fs');
 var kss  = require('kss-parse');
 var _ = require('lodash-node');
 
+
 module.exports = function(params, done) {
     'use strict';
 
     var grunt   = params.grunt;
-    var options = params.assemble.options.kss || {};
+    var options = params.assemble.options.styleguide || {};
     var tmpl    = fs.readFileSync(options.layout, 'utf8');
 
     if(!_.isUndefined(options)){
 
-        console.log('assemble-middleware-kss');
+        console.log('assemble-middleware-styleguide');
 
         kss.getSections(options.src, { mask: '*.scss' }, function(err, styleguide) {
             if (err) throw err;
