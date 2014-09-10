@@ -30,6 +30,15 @@ module.exports = function(params, done) {
 
             _.forEach(styleguide, function(val, key){
                 var sections = kss.flattenSection(val);
+                for(var i = 0; i < sections.length; i++){
+                    if(sections[i].markup){
+                        params.assemble.engine.render(sections[i].markup, params.assemble.options.data, function(err, content){
+                            if (err) throw err;
+                            sections[i].markup = content;
+                        });
+                    }
+                }
+
                 params.assemble.options.pages.push({
                     data: { sections: sections },
                     dest: options.dest + '/section-' + val.refParts[0] + '.html',

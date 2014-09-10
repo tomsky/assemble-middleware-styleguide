@@ -1,7 +1,7 @@
 {
   "name": "assemble-middleware-styleguide",
   "description": "Styleguide generator plugin for Assemble.",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "homepage": "https://github.com/tomsky/assemble-middleware-styleguide",
   "author": {
     "name": "Tom-Marius Olsen",
