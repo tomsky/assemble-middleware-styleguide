@@ -1,7 +1,7 @@
 {
   "name": "assemble-middleware-styleguide",
   "description": "Styleguide generator plugin for Assemble.",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "homepage": "https://github.com/tomsky/assemble-middleware-styleguide",
   "author": {
     "name": "Tom-Marius Olsen",
@@ -25,8 +25,7 @@
     "node": ">= 0.8.0"
   },
   "dependencies": {
-    "kss-parse": "0.1.x",
-    "lodash-node": "2.4.x"
+    "kss-parse": "0.1.x"
   },
   "devDependencies": {
 

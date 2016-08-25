@@ -2,34 +2,51 @@
  * assemble-middleware-styleguide
  * https://github.com/tomsky/assemble-middleware-styleguide
  *
- * Copyright (c) 2014 Tom-Marius Olsen
+ * Copyright (c) 2016 Tom-Marius Olsen
  * Licensed under the MIT license.
  */
 
-var fs = require('fs');
+var crypto = require('crypto');
 var kss  = require('kss-parse');
-var _ = require('lodash-node');
-
+var hashFilePath = '.grunt/assemble-middleware-styleguide/hashes.json';
 
 module.exports = function(params, done) {
     'use strict';
 
-    var grunt   = params.grunt;
-    var options = params.assemble.options.styleguide || {};
-    var tmpl    = fs.readFileSync(options.layout, 'utf8');
+    // Get a reference to Grunt
+    var grunt = params.grunt;
 
-    if(!_.isUndefined(options)){
+    // Validated configuration
+    grunt.config.requires('assemble.styleguide.options.styleguide.dest');
+    grunt.config.requires('assemble.styleguide.options.styleguide.src');
+    grunt.config.requires('assemble.styleguide.options.styleguide.layout');
 
-        console.log('assemble-middleware-styleguide');
+    // Read the layout template
+    var tmpl = grunt.file.read(grunt.config.get('assemble.styleguide.options.styleguide.layout'), 'utf8');
 
-        kss.getSections(options.src, { mask: '*.scss' }, function(err, styleguide) {
-            if (err) throw err;
+    kss.getSections(grunt.config.get('assemble.styleguide.options.styleguide.src'), { mask: '*.scss' }, function(err, styleguide) {
+        if (err) throw err;
 
-            //Add the styleguide toc to assemble globlally
-            params.assemble.options.data.styleguide = styleguide;
+        // Add the styleguide toc to assemble
+        params.assemble.options.data.styleguide = styleguide;
 
-            _.forEach(styleguide, function(val, key){
-                var sections = kss.flattenSection(val);
+        // Get the hashes
+        var hashes = (grunt.file.exists(hashFilePath)) ? grunt.file.readJSON(hashFilePath) : [];
+
+        styleguide.forEach(function(val, key){
+            // Flatten the section so it can be used by the template
+            var sections = kss.flattenSection(val);
+
+            // Create a hash of the section
+            var hash = crypto.createHash('md5').update(JSON.stringify(sections)).digest('hex');
+
+            // Check for changes
+            if(hashes[key] != hash){
+
+                // Update the hash for this section
+                hashes[key] = hash;
+
+                // Render the markup for each section
                 for(var i = 0; i < sections.length; i++){
                     if(sections[i].markup){
                         params.assemble.engine.render(sections[i].markup, params.assemble.options.data, function(err, content){
@@ -39,16 +56,20 @@ module.exports = function(params, done) {
                     }
                 }
 
+                // Push the section to assemble
                 params.assemble.options.pages.push({
                     data: { sections: sections },
-                    dest: options.dest + '/section-' + val.refParts[0] + '.html',
+                    dest: grunt.config.get('assemble.styleguide.options.styleguide.dest') + '/section-' + val.refParts[0] + '.html',
                     page: tmpl,
                 });
-            });
-
-            done();
+            }
         });
-    }
+
+        // Write a updated list of hashes.
+        grunt.file.write(hashFilePath, JSON.stringify(hashes));
+
+        done();
+    });
 };
 
 module.exports.options = {
